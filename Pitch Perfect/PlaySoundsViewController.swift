@@ -22,7 +22,7 @@ class PlaySoundsViewController: UIViewController {
     @IBOutlet weak var reverbSlider: UISlider!
  
         override func viewDidLoad() {
-        super.viewDidLoad()
+            super.viewDidLoad()
 
         audioPlayer = AVAudioPlayer(contentsOfURL: receivedAudio.filePathUrl, error: nil)
         audioPlayer.enableRate = true
@@ -45,6 +45,9 @@ class PlaySoundsViewController: UIViewController {
     @IBAction func PlaySlowAudio(sender: UIButton) {
         // play audio slowly here
         audioPlayer.stop()
+        audioEngine.stop()
+        audioEngine.reset()
+        
         audioPlayer.currentTime = 0
         audioPlayer.rate = 0.5
         audioPlayer.play()
@@ -53,6 +56,9 @@ class PlaySoundsViewController: UIViewController {
     @IBAction func PlayFastAudio(sender: UIButton) {
         // play audio fast here
         audioPlayer.stop()
+        audioEngine.stop()
+        audioEngine.reset()
+        
         audioPlayer.currentTime = 0
         audioPlayer.rate = 2
         audioPlayer.play()
@@ -96,18 +102,16 @@ class PlaySoundsViewController: UIViewController {
         audioPlayer.stop()
         audioEngine.stop()
         audioEngine.reset()
-        let url = audioRecorder.url
         audioEngine = AVAudioEngine()
         audioPlayerNode = AVAudioPlayerNode()
         audioEngine.attachNode(audioPlayerNode)
-        let file = AVAudioFile(forReading: url, error: nil)
         var reverb = AVAudioUnitReverb()
         reverb.wetDryMix = reverbv
         audioEngine.attachNode(reverb)
         let mainMixer = audioEngine.mainMixerNode
         audioEngine.connect(audioPlayerNode, to: reverb, format: nil)
-        audioEngine.connect(reverb, to: audioEngine.outputNode, format: file.processingFormat)
-        audioPlayerNode.scheduleFile(file, atTime: nil, completionHandler: nil)
+        audioEngine.connect(reverb, to: audioEngine.outputNode, format: audioFile.processingFormat)
+        audioPlayerNode.scheduleFile(audioFile, atTime: nil, completionHandler: nil)
         audioEngine.startAndReturnError(nil)
         audioPlayerNode.play()
     }
@@ -124,6 +128,7 @@ class PlaySoundsViewController: UIViewController {
         
         audioPlayer.stop()
         audioEngine.stop()
+        audioEngine.reset()
         audioPlayerNode.stop()
         reverbSlider.enabled = true
     }

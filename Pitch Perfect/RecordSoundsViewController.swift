@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+
 var audioRecorder:AVAudioRecorder!
 var recordedAudio:RecordedAudio!
 
@@ -22,23 +23,22 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate{
         // Dispose of any resources that can be recreated.
     }
     
-    @IBOutlet weak var torecordLabel: UILabel!
-    @IBOutlet weak var recordingLabel: UILabel!
-    @IBOutlet weak var pauseLabel: UILabel!
+    @IBOutlet weak var multiLabel: UILabel!
     @IBOutlet weak var pauseButton: UIButton!
     @IBOutlet weak var stopButton: UIButton!
     @IBOutlet weak var recordButton: UIButton!
     @IBOutlet weak var continueRecording: UIButton!
     
+    
+   
+    
 // using viewWillAppear as opposed to viewDidLoad because viewWillAppear will load every time this page is loaded and not just when the app starts
     override func viewWillAppear(animated: Bool) {
-        torecordLabel.hidden = false
         recordButton.enabled = true
-        recordingLabel.hidden = true
         stopButton.enabled = false
-        pauseLabel.hidden = true
         pauseButton.enabled = false
         continueRecording.enabled = false
+        multiLabel.hidden = true
     }
     
     //create a file using the current date and time for the filename to avoid naming conflict
@@ -64,27 +64,28 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate{
         audioRecorder.record()
 
         
-        torecordLabel.hidden = true
         recordButton.enabled = false
-        recordingLabel.hidden = false
         stopButton.enabled = true
-        pauseLabel.hidden = true
         pauseButton.enabled = true
-        
         continueRecording.enabled = false
+        
+        multiLabel.text = "recording"
+        multiLabel.hidden = false
     }
     
     // audioRecorderDidFinishRecording if true triggers segue
-    func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
+     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
         if(flag){
             recordedAudio = RecordedAudio()
             recordedAudio.filePathUrl = recorder.url
             recordedAudio.title = recorder.url.lastPathComponent
             self.performSegueWithIdentifier("stopRecording", sender: recordedAudio)
+            multiLabel.text = "recording successful"
         }else {
             println("Recording was not successful")
             recordButton.enabled = true
             stopButton.enabled = false
+            multiLabel.hidden = true
         }
     }
     
@@ -99,25 +100,25 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate{
     @IBAction func pauseButton(sender: UIButton) {
         audioRecorder.pause()
 
-        torecordLabel.hidden = true
         recordButton.enabled = false
-        recordingLabel.hidden = true
         stopButton.enabled = true
-        pauseLabel.hidden = false
         pauseButton.enabled = false
         continueRecording.enabled = true
+        
+        multiLabel.text = "recording paused"
+        multiLabel.hidden = false
     }
     
     @IBAction func continueRecording(sender: UIButton) {
         
         audioRecorder.record()
-        torecordLabel.hidden = true
         recordButton.enabled = false
-        recordingLabel.hidden = false
         stopButton.enabled = true
-        pauseLabel.hidden = true
         pauseButton.enabled = true
         continueRecording.enabled = false
+        
+        multiLabel.text = "recording"
+        multiLabel.hidden = false
     }
     
     @IBAction func stopRecording(sender: UIButton) {
@@ -125,12 +126,12 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate{
         audioRecorder.stop()
         var audioSession = AVAudioSession.sharedInstance()
         audioSession.setActive(false, error: nil)
-        torecordLabel.hidden = true
-        recordButton.enabled = true
-        recordingLabel.hidden = true
+        recordButton.enabled = false
         stopButton.enabled = false
-        pauseLabel.hidden = true
         pauseButton.enabled = false
+        
+        multiLabel.text = "recording complete"
+        multiLabel.hidden = false
     }
 
 }
