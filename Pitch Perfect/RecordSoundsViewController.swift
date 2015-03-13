@@ -72,30 +72,8 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate{
         multiLabel.text = "recording"
         multiLabel.hidden = false
     }
-    
-    // audioRecorderDidFinishRecording if true triggers segue
-     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
-        if(flag){
-            recordedAudio = RecordedAudio()
-            recordedAudio.filePathUrl = recorder.url
-            recordedAudio.title = recorder.url.lastPathComponent
-            self.performSegueWithIdentifier("stopRecording", sender: recordedAudio)
-            multiLabel.text = "recording successful"
-        }else {
-            println("Recording was not successful")
-            recordButton.enabled = true
-            stopButton.enabled = false
-            multiLabel.hidden = true
-        }
-    }
-    
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if (segue.identifier == "stopRecording") {
-            let playSoundsVC:PlaySoundsViewController = segue.destinationViewController as PlaySoundsViewController
-        let data = sender as RecordedAudio
-        playSoundsVC.receivedAudio = data
-        }
-    }
+   
+
 
     @IBAction func pauseButton(sender: UIButton) {
         audioRecorder.pause()
@@ -132,6 +110,34 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate{
         
         multiLabel.text = "recording complete"
         multiLabel.hidden = false
+    }
+    
+    
+    
+    // audioRecorderDidFinishRecording if true triggers segue
+    func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
+        if(flag){
+            recordedAudio = RecordedAudio(filePathUrlI: audioRecorder.url!, titleI: audioRecorder.url.lastPathComponent!)
+            self.performSegueWithIdentifier("stopRecording", sender: recordedAudio)
+            //            recordButton.enabled = false
+            //            stopButton.enabled = true
+            //            multiLabel.text = "recording successful"
+        }else {
+            println("Recording was not successful")
+            recordButton.enabled = true
+            stopButton.enabled = false
+            multiLabel.hidden = true
+        }
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if (segue.identifier == "stopRecording") {
+            let playSoundsVC:PlaySoundsViewController = segue.destinationViewController as PlaySoundsViewController
+            let data = sender as RecordedAudio
+            playSoundsVC.receivedAudio = data
+        }
+        
+        
     }
 
 }
